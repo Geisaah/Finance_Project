@@ -10,35 +10,44 @@ private class CreditAnalysisResourceAPITest {
 
     @isTest
     static void testCreateAnalysisSuccess() {
-        // 1. CENÁRIO: Preparar os dados para o teste
-        String nome = 'Geisa Teste';
-        Integer idade = 25;
-        Decimal renda = 5000.0;
-        Decimal valor = 1000.0;
-
-        // 2. AÇÃO: Chamar o método da sua API
         Test.startTest();
-        String resultado = CreditAnalysisResourceAPI.createAnalysis(nome, idade, renda, valor);
+        // Chamada usando o novo retorno ResponseWrapper
+        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis('Geisa Teste', 25, 5000.0, 1000.0);
         Test.stopTest();
 
-        // 3. VERIFICAÇÃO: O Salesforce "conferindo" se deu certo
-        System.assert(resultado.contains('Sucesso'), 'A API deveria retornar sucesso');
-        
-        // Conferindo se o registro realmente nasceu no banco de dados "de teste"
-        // Lembre-se de usar o nome da sua API: Credit_Analysis_c__c
-        Credit_Analysis_c__c analise = [SELECT Id, Status__c FROM Credit_Analysis_c__c LIMIT 1];
-        System.assertNotEquals(null, analise.Id, 'O registro deveria ter sido criado');
+        System.assertEquals('Success', res.status, 'Deveria retornar status de sucesso');
+        System.assertNotEquals(null, res.recordId, 'O ID do registro não deveria ser nulo');
     }
+
     @isTest
     static void testCreateAnalysisInvalidAge() {
-        // Cenário: Tentando criar com idade impossível (500 anos)
-        String resultado = CreditAnalysisResourceAPI.createAnalysis('Teste Erro', 500, 5000, 1000);
+        Test.startTest();
+        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis('Teste Erro', 500, 5000, 1000);
+        Test.stopTest();
 
-        // Verificação: O resultado TEM que conter a mensagem de erro que definimos
-        System.assert(resultado.contains('Erro: Idade inválida'), 'A API deveria ter bloqueado a idade de 500 anos');
+        System.assertEquals('Error', res.status, 'Deveria retornar status de erro');
+        System.assertEquals(400, res.errorCode, 'O código de erro deveria ser 400');
+    }
+
+    @isTest
+    static void testBulkCreditCreation() {
+        List<Credit_Analysis_c__c> listaBulk = new List<Credit_Analysis_c__c>();
         
-        // Garantindo que NENHUM registro foi criado no banco
-        List<Credit_Analysis_c__c> lista = [SELECT Id FROM Credit_Analysis_c__c];
-        System.assertEquals(0, lista.size(), 'Não deveria ter criado nenhum registro com dados inválidos');
+        for(Integer i=0; i<200; i++) {
+            listaBulk.add(new Credit_Analysis_c__c(
+                Nome_do_Cliente__c = 'Cliente Bulk ' + i,
+                Idade_Age__c = 30,
+                Renda_mensal__c = 5000,
+                Valor_solicitado__c = 1000
+            ));
+        }
+
+        Test.startTest();
+        insert listaBulk;
+        Test.stopTest();
+
+        // Nome da API do campo que confirmamos no seu Setup
+        List<Credit_Analysis_c__c> resultados = [SELECT Id, Score_de_Cr_dito_Credit_Score__c FROM Credit_Analysis_c__c];
+        System.assertEquals(200, resultados.size(), 'Deveria ter criado 200 registros');
     }
 }

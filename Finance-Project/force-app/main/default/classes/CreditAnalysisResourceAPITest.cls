@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
  * @group             : 
- * @last modified on  : 04-06-2026
+ * @last modified on  : 04-09-2026
  * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 **/
 @isTest
@@ -10,19 +10,36 @@ private class CreditAnalysisResourceAPITest {
 
     @isTest
     static void testCreateAnalysisSuccess() {
+        // Criando o Wrapper para um cenário de SUCESSO
+        CreditAnalysisResourceAPI.RequestWrapper req = new CreditAnalysisResourceAPI.RequestWrapper();
+        req.name = 'Geisa Test';
+        req.age = 33;
+        req.income = 5000;
+        req.requestedAmount = 1000;
+        req.email = 'geisaahfreitas@gmail.com';
+
         Test.startTest();
-        // Chamada usando o novo retorno ResponseWrapper
-        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis('Geisa Teste', 25, 5000.0, 1000.0);
+        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis(req);
         Test.stopTest();
 
+        // Aqui o status deve ser 'Success'
         System.assertEquals('Success', res.status, 'Deveria retornar status de sucesso');
         System.assertNotEquals(null, res.recordId, 'O ID do registro não deveria ser nulo');
     }
 
     @isTest
     static void testCreateAnalysisInvalidAge() {
+        // Criando o Wrapper para um cenário de ERRO (Idade 500)
+        CreditAnalysisResourceAPI.RequestWrapper req = new CreditAnalysisResourceAPI.RequestWrapper();
+        req.name = 'Test Erro';
+        req.age = 500; 
+        req.income = 5000;
+        req.requestedAmount = 1000;
+        req.email = 'erro@teste.com';
+
         Test.startTest();
-        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis('Teste Erro', 500, 5000, 1000);
+        // AGORA SIM: Passando o 'req' em vez de String, Integer...
+        CreditAnalysisResourceAPI.ResponseWrapper res = CreditAnalysisResourceAPI.createAnalysis(req);
         Test.stopTest();
 
         System.assertEquals('Error', res.status, 'Deveria retornar status de erro');
@@ -46,8 +63,7 @@ private class CreditAnalysisResourceAPITest {
         insert listaBulk;
         Test.stopTest();
 
-        // Nome da API do campo que confirmamos no seu Setup
-        List<Credit_Analysis_c__c> resultados = [SELECT Id, Score_de_Cr_dito_Credit_Score__c FROM Credit_Analysis_c__c];
+        List<Credit_Analysis_c__c> resultados = [SELECT Id FROM Credit_Analysis_c__c];
         System.assertEquals(200, resultados.size(), 'Deveria ter criado 200 registros');
     }
 }

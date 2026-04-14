@@ -1,0 +1,27 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 04-13-2026
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-card title="Ações de Crédito" icon-name="standard:approval">
+        <div class="slds-m-around_medium">
+            <lightning-button 
+                label="Aprovar" 
+                variant="success" 
+                onclick={handleApprove} 
+                icon-name="utility:check"
+                class="slds-m-right_x-small">
+            </lightning-button>
+            
+            <lightning-button 
+                label="Reprovar" 
+                variant="destructive" 
+                onclick={handleReject} 
+                icon-name="utility:close">
+            </lightning-button>
+        </div>
+    </lightning-card>
+</template>
